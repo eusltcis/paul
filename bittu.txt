@@ -126,8 +126,182 @@ if (isset($_POST['register'])) {
 
 
 
+<head>
+   
+   
+   
+    <title>Matrix Multiplication</title>
+</head>
+<body>
 
 
+    <h1>Matrix Multiplication</h1>
+    <form method="POST">
+        <label for="size">Enter the size of the matrices (n x n):</label>
+        <input type="number" name="size" id="size" required>
+        <input type="submit" value="Create Matrices">
+    </form>
+
+
+
+
+
+  
+  
+
+
+
+
+
+
+    <?php
+	
+	
+	 
+	
+		
+	
+    if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['size'])) {
+           $size = (int)$_POST['size'];
+                 echo '<form method="POST">';
+				 
+                 echo '<h2>Enter Matrix A : </h2>';
+				  
+				 
+				 
+				 
+				 
+        for ($i = 0; $i < $size; $i++) {
+            echo '<input type="text" name="a[' . $i . ']" placeholder="Row ' . ($i + 1) . '" required>';
+        }
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+        
+        echo '<h2>Enter Matrix B:</h2>';
+        for ($i = 0; $i < $size; $i++) {
+            echo '<input type="text" name="b[' . $i . ']" placeholder="Row ' . ($i + 1) . '" required>';
+        }
+		
+		
+		
+                  echo '<input type="hidden" name="size" value="' . $size . '">';
+                  echo '<input type="submit" value="Multiply Matrices">';
+                  echo '</form>';
+    }
+	
+	
+	
+	
+	
+	
+	
+
+    if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['a']) && isset($_POST['b'])) {
+        $size = (int)$_POST['size'];
+        $a = array_map('trim', $_POST['a']);
+        $b = array_map('trim', $_POST['b']);
+        
+       
+        $matrixA = array();
+        $matrixB = array();
+        
+        for ($i = 0; $i < $size; $i++) {
+            $matrixA[$i] = array_map('intval', explode(' ', $a[$i]));
+            $matrixB[$i] = array_map('intval', explode(' ', $b[$i]));
+        }
+        
+
+        $result = array_fill(0, $size, array_fill(0, $size, 0));
+
+        
+       /* for ($i = 0; $i < $size; $i++) {
+            for ($j = 0; $j < $size; $j++) {
+                for ($k = 0; $k < $size; $k++) {
+                    $result[$i][$j] += $matrixA[$i][$k] * $matrixB[$k][$j];
+                }
+            }
+        }
+		*/
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+
+        
+        echo '<h2>Result of Matrix A X Matrix B:</h2>';
+        echo '<table border="1">';
+        for ($i = 0; $i < $size; $i++) {
+            echo '<tr>';
+            for ($j = 0; $j < $size; $j++) {
+                echo '<td>' . $result[$i][$j] . '</td>';
+            }
+            echo '</tr>';
+        }
+        echo '</table>';
+    }
+    ?>
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+<html>
+<head>
+
+
+</head>
+
+
+<body>
+ <h1>Matrix Multiplication</h1>
+    <form method="POST">
+        <label for="size">Enter the size of the matrices (n x n):</label>
+        <input type="number" name="size" id="size" required>
+        <input type="submit" value="Create Matrices">
+    </form>
+	
+	
+
+
+
+
+
+
+
+</body>
+
+</html>
 
 
 
