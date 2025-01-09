@@ -311,3 +311,106 @@ if (isset($_POST['register'])) {
 
 
 
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Simple Library Management System</title>
+</head>
+<body>
+    <h1>Simple Library Management System</h1>
+    <form action="insert_books.php" method="POST">
+        <label>Enter ISBN:</label>
+        <input type="text" name="isbn" required><br><br>
+        <label>Enter Title:</label>
+        <input type="text" name="title" required><br><br>
+        <label>Enter Author:</label>
+        <input type="text" name="author" required><br><br>
+        <label>Enter Edition:</label>
+        <input type="text" name="edition" required><br><br>
+        <label>Enter Publication:</label>
+        <input type="text" name="publication" required><br><br>
+        <button type="submit">Submit</button>
+        <button type="reset">Reset</button>
+    </form>
+    <p>New record created successfully</p>
+    <a href="search_book.php">To search for the Book information click here</a>
+</body>
+</html>
+
+
+
+
+<?php
+$host = "localhost";
+$user = "root";
+$password = "";
+$dbname = "books";
+
+$conn = new mysqli($host, $user, $password, $dbname);
+
+if ($conn->connect_error) {
+    die("Connection failed: " . $conn->connect_error);
+}
+?>
+
+
+<?php
+include 'DbConnection.php';
+
+if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+    $isbn = $_POST['isbn'];
+    $title = $_POST['title'];
+    $author = $_POST['author'];
+    $edition = $_POST['edition'];
+    $publication = $_POST['publication'];
+
+    $sql = "INSERT INTO book_info (isbn, title, author, edition, publication) 
+            VALUES ('$isbn', '$title', '$author', '$edition', '$publication')";
+
+    if ($conn->query($sql) === TRUE) {
+        echo "New record created successfully!";
+    } else {
+        echo "Error: " . $sql . "<br>" . $conn->error;
+    }
+
+    $conn->close();
+}
+?>
+
+
+
+<?php
+include 'DbConnection.php';
+
+if (isset($_GET['title'])) {
+    $title = $_GET['title'];
+    $sql = "SELECT * FROM book_info WHERE title LIKE '%$title%'";
+    $result = $conn->query($sql);
+    
+    if ($result->num_rows > 0) {
+        echo "<h1>Search Results</h1>";
+        while ($row = $result->fetch_assoc()) {
+            echo "ISBN: " . $row['isbn'] . "<br>";
+            echo "Title: " . $row['title'] . "<br>";
+            echo "Author: " . $row['author'] . "<br>";
+            echo "Edition: " . $row['edition'] . "<br>";
+            echo "Publication: " . $row['publication'] . "<br><br>";
+        }
+    } else {
+        echo "No results found!";
+    }
+}
+?>
+
+<form method="GET" action="">
+    <label>Enter Title:</label>
+    <input type="text" name="title" required>
+    <button type="submit">Search</button>
+</form>
+
+
+
+
+
+
+
