@@ -1,416 +1,337 @@
-
-<?php
-
-
-$server = "localhost";
-$user = "root";
-$pass = "";
-$db = "students1";
+class Book {
+    int bookID; 
+    String title ;
+    String author;
+    boolean available ; 
 
 
-$conn = new mysqli($server, $user, $pass, $db);
+    Book (int bookID, String title, String author) {
+        this.bookID = bookID;
+        this.title = title;
+        this.author = author;
+        this.available = true;
 
-if($conn->connect_error){
-    die("Connection failed: " . $conn->connect_error);
-} else {
-    echo "Connected successfully";
-}
-
-
-?>
+    }
 
 
-
-
-
-<?php 
-
-require_once 'dbconnection.php';
-
-if (isset($_POST['login'])) {
-    $username = $_POST['username'];
-    $password = $_POST['password'];
-
-    $sql = "SELECT * FROM students WHERE username = '$username' AND password  = '$password' ";
-
-    $result = $conn->query($sql);
-
-    if ($result->num_rows > 0) {
-
-            session_start() ;
-            $_SESSION['username'] = $username;
-
-
-
-           
-            echo "Login successful";
-            header("Location: welcome.php");
-
+    void borrowBook () {
+        if (available) {
+            available = false;
         } else {
-            echo "Login failed";
+            System.out.println("Book is not available");
         }
+    }
+
+
+    void returnBook () {
+        if (available) {
+            available = true;
+        } else {
+            System.out.println("Book is already returned");
+        }
+    }
+
+
+    void displayinfo () {
+        System.out.println("Book ID: " + bookID);
+        System.out.println("Title: " + title);
+        System.out.println("Author: " + author);
+        System.out.println("Available: " + available);
+    }
+}
+
+
+
+// member class 
+
+class Memeber {
+    int memberID;
+    String name;
+    Book borrowBook ;
+
+
+    Memeber (int memberID, String name) {
+        this.memberID = memberID;
+        this.name = name;
+        this.borrowBook = null;
+    }
+
+    void borrowBook(Book b) {
+        if (b.available) {
+            b.borrowBook();
+        } else {
+            System.out.println("Book is not available");
+        }
+    }
+
+    void retrunBook () {
+        if (borrowBook != null) {
+            borrowBook.returnBook();
+            borrowBook = null;
+        } else {
+            System.out.println("No book to return");
+        }
+    }
+
+
+    void displayinfo () {
+        System.out.println("Member ID: " + memberID);
+        System.out.println("Name: " + name);
+        if (borrowBook != null) {
+            System.out.println("Borrowed Book: " +borrowBook.title);
+        } else {
+            System.out.println("No book borrowed");
+        }
+    }
+}
     
-}
 
 
+// Library class
 
-?>
+class Library {
+    public static void main(String[] args) {
 
+        Book [] books = {
+            new Book(1, "Java", "James"),
+            new Book(2, "Python", "Guido"),
+            new Book(3, "C++", "Bjarne")
+        };
 
-<form action="" method="post">
-        <label for="name">username</label>
-        <input type="text" name="username" id="name" required>
-        <br>
-         <label for="password">Password</label>
-        <input type="password" name="password" id="password" required>
-        <br>
-        <button type="submit" name="login">Login</button>
-    </form>
-
-
-
-
-
-
-
-
-<?php 
-
-require_once 'dbconnection.php';
-
-
-if (isset($_POST['register'])) {
-    $username = $_POST['username'];
-    $password = $_POST['password'];
-
-    $sql = "INSERT INTO students (username, password) VALUES ('$username', '$password')";
-
-    if ($conn->query($sql) === TRUE) {
-        echo "<br>New record created successfully";
-    } else {
-        echo "Error: " . $sql . "<br>" . $conn->error;
-    }
-}
-
-
-
-?>
-
-
-
-<h1>Rgistration </h1>
-    <form action="" method="post">
-        <label for="name">username</label>
-        <input type="text" name="username" id="name" required>
-        <br>
-         <label for="password">Password</label>
-        <input type="password" name="password" id="password" required>
-        <br>
-        <button type="submit" name="register">Register</button>
-        <a href="login.php">Login</a>
-
-    </form>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<head>
-   
-   
-   
-    <title>Matrix Multiplication</title>
-</head>
-<body>
-
-
-    <h1>Matrix Multiplication</h1>
-    <form method="POST">
-        <label for="size">Enter the size of the matrices (n x n):</label>
-        <input type="number" name="size" id="size" required>
-        <input type="submit" value="Create Matrices">
-    </form>
-
-
-
-
-
-  
-  
-
-
-
-
-
-
-    <?php
-	
-	
-	 
-	
-		
-	
-    if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['size'])) {
-           $size = (int)$_POST['size'];
-                 echo '<form method="POST">';
-				 
-                 echo '<h2>Enter Matrix A : </h2>';
-				  
-				 
-				 
-				 
-				 
-        for ($i = 0; $i < $size; $i++) {
-            echo '<input type="text" name="a[' . $i . ']" placeholder="Row ' . ($i + 1) . '" required>';
-        }
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-        
-        echo '<h2>Enter Matrix B:</h2>';
-        for ($i = 0; $i < $size; $i++) {
-            echo '<input type="text" name="b[' . $i . ']" placeholder="Row ' . ($i + 1) . '" required>';
-        }
-		
-		
-		
-                  echo '<input type="hidden" name="size" value="' . $size . '">';
-                  echo '<input type="submit" value="Multiply Matrices">';
-                  echo '</form>';
-    }
-	
-	
-	
-	
-	
-	
-	
-
-    if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['a']) && isset($_POST['b'])) {
-        $size = (int)$_POST['size'];
-        $a = array_map('trim', $_POST['a']);
-        $b = array_map('trim', $_POST['b']);
+        Memeber [] members = {
+            new Memeber(1, "John"),
+            new Memeber(2, "Doe"),
+            new Memeber(3, "mike")
+        };
         
        
-        $matrixA = array();
-        $matrixB = array();
-        
-        for ($i = 0; $i < $size; $i++) {
-            $matrixA[$i] = array_map('intval', explode(' ', $a[$i]));
-            $matrixB[$i] = array_map('intval', explode(' ', $b[$i]));
-        }
-        
 
-        $result = array_fill(0, $size, array_fill(0, $size, 0));
+        members[0].borrowBook(books[0]);
+        members[1].borrowBook(books[1]);
+        members[2].borrowBook(books[2]);
 
-        
-       /* for ($i = 0; $i < $size; $i++) {
-            for ($j = 0; $j < $size; $j++) {
-                for ($k = 0; $k < $size; $k++) {
-                    $result[$i][$j] += $matrixA[$i][$k] * $matrixB[$k][$j];
-                }
-            }
+
+        members[0].retrunBook();
+        members[1].retrunBook();
+
+       System.out.println("Books info");
+        for (int i = 0; i < 3; i++) {
+            books[i].displayinfo();
+            System.out.println();
         }
-		*/
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
 
         
-        echo '<h2>Result of Matrix A X Matrix B:</h2>';
-        echo '<table border="1">';
-        for ($i = 0; $i < $size; $i++) {
-            echo '<tr>';
-            for ($j = 0; $j < $size; $j++) {
-                echo '<td>' . $result[$i][$j] . '</td>';
-            }
-            echo '</tr>';
-        }
-        echo '</table>';
+        System.out.println("Members info");
+        for (int i = 0; i < 3; i++) {
+            members[i].displayinfo();
+            System.out.println();
+        }   
+        
+
     }
-    ?>
-</body>
-</html>
-
-
-
-
-
-
-
-
-
-<html>
-<head>
-
-
-</head>
-
-
-<body>
- <h1>Matrix Multiplication</h1>
-    <form method="POST">
-        <label for="size">Enter the size of the matrices (n x n):</label>
-        <input type="number" name="size" id="size" required>
-        <input type="submit" value="Create Matrices">
-    </form>
-	
-	
-
-
-
-
-
-
-
-</body>
-
-</html>
-
-
-
-
-
-
-
-
-
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Simple Library Management System</title>
-</head>
-<body>
-    <h1>Simple Library Management System</h1>
-    <form action="insert_books.php" method="POST">
-        <label>Enter ISBN:</label>
-        <input type="text" name="isbn" required><br><br>
-        <label>Enter Title:</label>
-        <input type="text" name="title" required><br><br>
-        <label>Enter Author:</label>
-        <input type="text" name="author" required><br><br>
-        <label>Enter Edition:</label>
-        <input type="text" name="edition" required><br><br>
-        <label>Enter Publication:</label>
-        <input type="text" name="publication" required><br><br>
-        <button type="submit">Submit</button>
-        <button type="reset">Reset</button>
-    </form>
-    <p>New record created successfully</p>
-    <a href="search_book.php">To search for the Book information click here</a>
-</body>
-</html>
-
-
-
-
-<?php
-$host = "localhost";
-$user = "root";
-$password = "";
-$dbname = "books";
-
-$conn = new mysqli($host, $user, $password, $dbname);
-
-if ($conn->connect_error) {
-    die("Connection failed: " . $conn->connect_error);
 }
-?>
 
 
-<?php
-include 'DbConnection.php';
 
-if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-    $isbn = $_POST['isbn'];
-    $title = $_POST['title'];
-    $author = $_POST['author'];
-    $edition = $_POST['edition'];
-    $publication = $_POST['publication'];
 
-    $sql = "INSERT INTO book_info (isbn, title, author, edition, publication) 
-            VALUES ('$isbn', '$title', '$author', '$edition', '$publication')";
 
-    if ($conn->query($sql) === TRUE) {
-        echo "New record created successfully!";
-    } else {
-        echo "Error: " . $sql . "<br>" . $conn->error;
+
+
+
+
+
+
+
+import java.util.Scanner;
+class seatss{
+	public static void main (String[]Args)
+	{
+		String seats[][] = new String [5][8];
+		
+		int seatNum= 1;
+		for (int i=0;i<5;i++)
+		{
+			for (int j=0;j<8;j++)
+			{
+				System.out.print(seatNum+ " ");
+				seats[i][j] = seatNum+ " ";
+				seatNum++;
+			}
+			System.out.println(" ");
+		}
+		
+		Scanner input = new Scanner(System.in);
+		System.out.print("Enter the seat number :- ");
+		int userinput=input.nextInt();
+		
+		String userseatnumber = userinput+ " ";
+		
+		if(userinput >0 && userinput <=40)
+		{
+			for (int i=0;i<5;i++)
+		{
+			for (int j=0;j<8;j++)
+			
+			if(userseatnumber.equals(seats[i][j]))
+			{
+				seats[i][j]= "X";
+			}
+			
+		}
+		
+		
+		}
+		else
+			{
+				System.out.println("Seat is resavered");
+			}
+	
+	for(i=0;i<5;i++){
+		for(j=0;j<8;j++)
+		{
+			System.out.print(seats[i][j]);
+		}
+	}
+	System.out.println(" ");
+		
+	}
+}
+
+
+
+
+
+
+
+
+
+abstract class Animal {
+    protected int legs;
+
+    protected Animal(int legs) {
+        this.legs = legs;
     }
 
-    $conn->close();
+    abstract void eat();
+
+    void walk() {
+        System.out.println("Walks with " + legs + " legs");
+    }
+
 }
-?>
+
+class Spider extends Animal {
+
+    Spider() {
+        super(8);
+    }
+
+    @Override
+    void eat() {
+        System.out.println("Spider is eating");
+    }
+
+}
+
+interface Pet {
+
+    String getName();
+
+    void setName(String name);
+
+    void play();
+
+}
+
+class Cat extends Animal implements Pet {
+    String name;
+
+    Cat(String name) {
+        super(4);
+
+        setName(name);
+
+    }
+
+    Cat() {
+        this("Kitty");
+
+    }
+
+    @Override
+    public void setName(String name) {
+        this.name = name ; 
+    }
+
+    @Override 
+    public String getName() {
+        return name ;
+    }
+
+    @Override
+
+    public void play () {
+        System.out.println("Cat is Playing");
+    }
 
 
+    void eat() {
+        System.out.println("Cat is Eating");
+    }
 
-<?php
-include 'DbConnection.php';
+}
 
-if (isset($_GET['title'])) {
-    $title = $_GET['title'];
-    $sql = "SELECT * FROM book_info WHERE title LIKE '%$title%'";
-    $result = $conn->query($sql);
+
+class Fish extends Animal {
     
-    if ($result->num_rows > 0) {
-        echo "<h1>Search Results</h1>";
-        while ($row = $result->fetch_assoc()) {
-            echo "ISBN: " . $row['isbn'] . "<br>";
-            echo "Title: " . $row['title'] . "<br>";
-            echo "Author: " . $row['author'] . "<br>";
-            echo "Edition: " . $row['edition'] . "<br>";
-            echo "Publication: " . $row['publication'] . "<br><br>";
-        }
-    } else {
-        echo "No results found!";
+    Fish() {
+        super(0) ;
+
+    }
+
+    @Override
+
+    void walk () {
+        System.out.println("fish cant walk");
+    }
+
+    @Override
+
+    void eat() {
+
     }
 }
-?>
-
-<form method="GET" action="">
-    <label>Enter Title:</label>
-    <input type="text" name="title" required>
-    <button type="submit">Search</button>
-</form>
 
 
 
 
 
+public class answer {
+
+    public static void main(String[] args) {
+
+        Fish d = new Fish();
+        Cat c = new Cat("Fluffy");
+        Animal e = new Spider();
+        Animal a = new Fish();
+        Pet p = new Cat();
+
+        c.getName();
+        d.walk();
+        a.walk();
+        e.eat();
+        p.play();
 
 
+
+
+        // poly 
+
+        Animal newAnimal = new Cat("Tommy");
+        newAnimal.eat();
+
+
+
+
+    }
+}
