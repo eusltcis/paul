@@ -133,69 +133,111 @@ class Library {
 
 
 
-
-
-
-
-
-
-
-
-
 import java.util.Scanner;
-class seatss{
-	public static void main (String[]Args)
-	{
-		String seats[][] = new String [5][8];
-		
-		int seatNum= 1;
-		for (int i=0;i<5;i++)
-		{
-			for (int j=0;j<8;j++)
-			{
-				System.out.print(seatNum+ " ");
-				seats[i][j] = seatNum+ " ";
-				seatNum++;
-			}
-			System.out.println(" ");
-		}
-		
-		Scanner input = new Scanner(System.in);
-		System.out.print("Enter the seat number :- ");
-		int userinput=input.nextInt();
-		
-		String userseatnumber = userinput+ " ";
-		
-		if(userinput >0 && userinput <=40)
-		{
-			for (int i=0;i<5;i++)
-		{
-			for (int j=0;j<8;j++)
-			
-			if(userseatnumber.equals(seats[i][j]))
-			{
-				seats[i][j]= "X";
-			}
-			
-		}
-		
-		
-		}
-		else
-			{
-				System.out.println("Seat is resavered");
-			}
-	
-	for(i=0;i<5;i++){
-		for(j=0;j<8;j++)
-		{
-			System.out.print(seats[i][j]);
-		}
-	}
-	System.out.println(" ");
-		
-	}
+
+public class SeatSystem {
+
+    public static void main(String[] args) {
+        System.out.println("Seat System");
+
+        String[][] seats = new String[5][8];
+        int seatNumber = 1;
+
+        // Initialize the seat layout
+        for (int i = 0; i < 5; i++) {
+            for (int j = 0; j < 8; j++) {
+                seats[i][j] = seatNumber + " ";
+                seatNumber++;
+            }
+        }
+
+        // Print the initial seat layout
+        printSeats(seats);
+
+        // Start the seat reservation system
+        SeatSystem seatSystem = new SeatSystem();
+        seatSystem.checkSeat(seats);
+
+        System.out.println("Thank you for using the Seat System!");
+    }
+
+    void checkSeat(String[][] seats) {
+        Scanner inputSeat = new Scanner(System.in);  // Scanner initialized once
+        boolean wantAnotherSeat = true;
+
+        // Loop to keep checking seats until the user exits
+        while (wantAnotherSeat) {
+            System.out.println("Enter the seat number (1-40): ");
+            int seatNumber = inputSeat.nextInt();
+
+            // Validate seat number
+            if (seatNumber < 1 || seatNumber > 40) {
+                System.out.println("Invalid seat number! Please choose a seat between 1 and 40.");
+                continue;
+            }
+
+            boolean isSeatAvailable = false;
+            int row = -1, column = -1;
+
+            // Search for the seat
+            for (int i = 0; i < 5; i++) {
+                for (int j = 0; j < 8; j++) {
+                    if (seats[i][j].trim().equals(String.valueOf(seatNumber))) {
+                        isSeatAvailable = true;
+                        row = i;
+                        column = j;
+                        break;
+                    }
+                }
+                if (isSeatAvailable) {
+                    break;
+                }
+            }
+
+            // Check availability and reserve seat
+            if (isSeatAvailable) {
+                System.out.println("Seat is available. Do you want to reserve it? (Y/N)");
+                String reserveSeat = inputSeat.next();
+
+                if (reserveSeat.equalsIgnoreCase("Y")) {
+                    seats[row][column] = "X";
+                    System.out.println("Seat reserved successfully!");
+                } else {
+                    System.out.println("Seat not reserved.");
+                }
+            } else {
+                System.out.println("Seat is already reserved. Please choose another seat.");
+            }
+
+            // Print updated seat layout
+            printSeats(seats);
+
+            // Ask user if they want to reserve another seat
+            System.out.println("Do you want to reserve another seat? (Y/N)");
+            String anotherSeat = inputSeat.next();
+
+            if (!anotherSeat.equalsIgnoreCase("Y")) {
+                wantAnotherSeat = false;
+            }
+        }
+
+        inputSeat.close();  // Close the scanner properly
+    }
+
+    // Utility method to print seats
+    static void printSeats(String[][] seats) {
+        System.out.println("\nCurrent Seat Layout:");
+        for (int i = 0; i < 5; i++) {
+            for (int j = 0; j < 8; j++) {
+                System.out.printf("%-4s", seats[i][j]);
+            }
+            System.out.println();
+        }
+        System.out.println();
+    }
 }
+
+
 
 
 
@@ -333,5 +375,173 @@ public class answer {
 
 
 
+    }
+}
+
+
+
+
+
+
+
+import java.util.Arrays;
+import java.util.Comparator;
+
+abstract class Player{
+    int playerID;
+    String name;
+    String country;
+    protected int[] scores;
+
+    public Player(int playerID, String name, String country, int[] scores){
+        this.playerID = playerID;
+        this.name = name;
+        this.country = country;
+        this.scores = scores;
+    }
+
+    public int getPlayerID(){
+        return playerID;
+    }
+
+    public String getName(){
+        return name;
+    }
+
+    public String getCountry(){
+        return country;
+    }
+
+    abstract void addScore(int score);
+
+    abstract void printDetails();
+}
+
+class Batsman extends Player{
+    private int runs;
+
+    public Batsman(int playerID, String name, String country, int[] scores){
+        super(playerID, name, country, scores);
+        for(int score : scores){
+            runs += score;
+        }
+    }
+
+    public int getRuns(){
+        return runs;
+    }
+
+    @Override
+    public void addScore(int score){
+        if(score >= 0 && score <= 100){
+            scores = Arrays.copyOf(scores, scores.length + 1);
+            scores[scores.length - 1] = score;
+            runs += score;
+        }
+    }
+
+    @Override
+    public void printDetails(){
+        System.out.println("Batsman ID: " + playerID);
+        System.out.println("Batsman name: " + name);
+        System.out.println("Batsman country: " + country);
+        System.out.println("Batsman scores: " + Arrays.toString(scores));
+        System.out.println("Total runs: " + runs);
+    }
+}
+
+class Bowler extends Player{
+    int wickets;
+
+    public Bowler(int playerID, String name, String country, int[] scores){
+        super(playerID, name, country, scores);
+        for(int score : scores){
+            wickets += score;
+        }
+    }
+
+    public int getWickets(){
+        return wickets;
+    }
+
+    @Override
+    public void addScore(int score){
+        if(score >= 0 && score <= 10){
+            scores = Arrays.copyOf(scores, scores.length + 1);
+            scores[scores.length - 1] = score;
+            wickets += score;
+        }
+    }
+
+    @Override
+    public void printDetails(){
+        System.out.println("Bowler's ID: " + playerID);
+        System.out.println("Bowler's name: " + name);
+        System.out.println("Bowler's country: " + country);
+        System.out.println("Bowler's Wickets: " + Arrays.toString(scores));
+    }
+}
+
+public class CricketApp{
+    public static void main(String[] args){
+        Batsman[] bat = new Batsman[] {
+            new Batsman(1, "Sachin Tendulkar", "India", new int[] {42, 0, 61, 15, 0, 100, 23, 64, 41, 0, 26}),
+            new Batsman(2, "Virat Kohli", "India", new int[] {0, 25, 10, 60, 11, 0, 40, 11, 0, 2, 0}),
+            new Batsman(3, "MS Dhoni", "India", new int[] {6, 22, 48, 0, 11, 69, 0, 21, 19, 0, 42}),
+            new Batsman(4, "Ricky Ponting", "Australia", new int[] {11, 0, 28, 0, 64, 18, 45, 26, 0, 11, 0}),
+            new Batsman(5, "Brian Lara", "West Indies", new int[] {0, 13, 21, 47, 0, 69, 17, 0, 12, 0, 40})
+        };
+
+        Bowler[] bowl = new Bowler[] {
+            new Bowler(1, "Muttiah Muralitharan", "Sri Lanka", new int[] {0, 10, 6, 8, 0, 1, 0, 2, 4, 0, 6}),
+            new Bowler(2, "Shane Warne", "Australia", new int[] {6, 0, 1, 0, 2, 0, 4, 10, 0, 6, 8}),
+            new Bowler(3, "Wanindu Hasaranga", "Sri Lanka", new int[] {0, 1, 0, 6, 8, 4, 2, 0, 6, 0, 10}),
+            new Bowler(4, "Glenn McGrath", "Australia", new int[] {4, 2, 6, 0, 10, 0, 1, 8, 6, 0, 0}),
+            new Bowler(5, "Dale Steyn", "South Africa", new int[] {0, 4, 0, 2, 1, 6, 10, 0, 8, 6, 0})
+        };
+
+        bat[0].addScore(14);
+
+        Batsman highestRuns = Arrays.stream(bat).max(Comparator.comparingInt(Batsman::getRuns)).orElse(null);
+        Bowler highestWickets = Arrays.stream(bowl).max(Comparator.comparingInt(Bowler::getWickets)).orElse(null);
+
+        System.out.println("----Batsman details----");
+        for(Batsman b : bat){
+            b.printDetails();
+            System.out.println();
+        }
+
+        System.out.println("----Bowler details----");
+        for(Bowler b : bowl){
+            b.printDetails();
+            System.out.println();
+        }
+
+        System.out.println("----Batsman with highest runs----");
+        if(highestRuns != null) highestRuns.printDetails();
+				
+				System.out.println();
+
+        System.out.println("----Bowler with highest wickets----");
+        if(highestWickets != null) highestWickets.printDetails();
+				
+				
+
+        System.out.println("\n----Players from Australia----");
+        System.out.println("\tBatsmen from Australia:");
+        for(Batsman b : bat){
+            if("Australia".equals(b.getCountry())){
+                b.printDetails();
+                System.out.println();
+            }
+        }
+
+        System.out.println("\tBowlers from Australia");
+        for(Bowler b : bowl){
+            if("Australia".equals(b.getCountry())){
+                b.printDetails();
+                System.out.println();
+            }
+        }
     }
 }
