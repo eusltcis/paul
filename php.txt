@@ -114,6 +114,153 @@ if (isset($_GET['search'])) {
 ?>
 
 
+// matrix
+
+
+<?php
+echo "Matrix Operations"; 
+
+if (isset($_POST['submit'])) {
+    $row1 = $_POST['row1'];
+    $col1 = $_POST['col1'];
+    $row2 = $_POST['row2'];
+    $col2 = $_POST['col2'];
+    $opr = $_POST['opr']; 
+
+    // Check if matrix operation is possible
+    $valid = false;
+    if ($opr == '*' && $col1 == $row2) {
+        $valid = true;
+    } elseif (($opr == '+' || $opr == '-') && ($row1 == $row2 && $col1 == $col2)) {
+        $valid = true;
+    }
+
+    if ($valid) {
+        echo "<form action='' method='POST'>";
+        echo "First Matrix<br>"; 
+        for ($i = 0; $i < $row1; $i++) {
+            for ($j = 0; $j < $col1; $j++) {
+                echo "<input name='mat1{$i}{$j}' required> ";
+            }
+            echo "<br>"; 
+        }
+
+        echo "Second Matrix<br>"; 
+        for ($i = 0; $i < $row2; $i++) {
+            for ($j = 0; $j < $col2; $j++) {
+                echo "<input name='mat2{$i}{$j}' required> ";
+            }
+            echo "<br>"; 
+        }
+
+        // Hidden Inputs to pass matrix dimensions and operation
+        echo "<button type='submit' name='calc'>Calculate</button>";
+        echo "<input type='hidden' name='row1' value='$row1'>";
+        echo "<input type='hidden' name='col1' value='$col1'>";
+        echo "<input type='hidden' name='row2' value='$row2'>";
+        echo "<input type='hidden' name='col2' value='$col2'>";
+        echo "<input type='hidden' name='opr' value='$opr'>";
+        echo "</form>";
+
+    } else {
+        echo "<script>alert('Matrix operation not possible with the given dimensions');</script>";
+        header("Refresh:0"); // Refreshes the page
+    }
+}
+
+// Processing Matrix Calculation
+if (isset($_POST['calc'])) {
+    $row1 = $_POST['row1'];
+    $col1 = $_POST['col1'];
+    $row2 = $_POST['row2'];
+    $col2 = $_POST['col2'];
+    $opr = $_POST['opr']; 
+
+    $matrix1 = array(); 
+    $matrix2 = array(); 
+
+    // Retrieving First Matrix
+    for ($i = 0; $i < $row1; $i++) {
+        for ($j = 0; $j < $col1; $j++) {
+            $matrix1[$i][$j] = $_POST["mat1{$i}{$j}"];
+        }
+    }
+
+    // Retrieving Second Matrix
+    for ($i = 0; $i < $row2; $i++) {
+        for ($j = 0; $j < $col2; $j++) {
+            $matrix2[$i][$j] = $_POST["mat2{$i}{$j}"];
+        }
+    }
+
+    // Performing Matrix Operations
+    $result = array();
+
+    switch ($opr) {
+        case '+': // Matrix Addition
+            for ($i = 0; $i < $row1; $i++) {
+                for ($j = 0; $j < $col1; $j++) {
+                    $result[$i][$j] = $matrix1[$i][$j] + $matrix2[$i][$j];
+                }
+            }
+            break;
+
+        case '-': // Matrix Subtraction
+            for ($i = 0; $i < $row1; $i++) {
+                for ($j = 0; $j < $col1; $j++) {
+                    $result[$i][$j] = $matrix1[$i][$j] - $matrix2[$i][$j];
+                }
+            }
+            break;
+
+        case '*': // Matrix Multiplication
+            for ($i = 0; $i < $row1; $i++) {
+                for ($j = 0; $j < $col2; $j++) {
+                    $result[$i][$j] = 0;
+                    for ($k = 0; $k < $col1; $k++) {
+                        $result[$i][$j] += $matrix1[$i][$k] * $matrix2[$k][$j];
+                    }
+                }
+            }
+            break;
+
+        default:
+            echo "Invalid Operator!";
+            break;
+    }
+
+    // Displaying Result
+    echo "<h3>Result Matrix:</h3>";
+    for ($i = 0; $i < count($result); $i++) {
+        for ($j = 0; $j < count($result[0]); $j++) {
+            echo $result[$i][$j] . " ";
+        }
+        echo "<br>";
+    }
+}
+?>
+
+<html>
+<body>
+    <form action="" method="POST">
+        <label>First Matrix:</label><br>
+        <input type="number" name="row1" placeholder="Rows" required>
+        <input type="number" name="col1" placeholder="Columns" required><br>
+
+        <label>Operator (+, -, *):</label>
+        <input type="text" name="opr" placeholder="Operator" required><br>
+
+        <label>Second Matrix:</label><br>
+        <input type="number" name="row2" placeholder="Rows" required>
+        <input type="number" name="col2" placeholder="Columns" required><br>
+
+        <button name="submit" type="submit">Submit</button>
+    </form>
+</body>
+</html>
+
+
+
 
 
 
