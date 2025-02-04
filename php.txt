@@ -1,0 +1,122 @@
+<?php
+// Function to generate Pascal's Triangle
+function generatePascalsTriangle($rows) {
+    $triangle = array();
+    
+    for ($i = 0; $i < $rows; $i++) {
+        $triangle[$i] = array();
+        for ($j = 0; $j <= $i; $j++) {
+            if ($j == 0 || $j == $i) {
+                $triangle[$i][$j] = 1;
+            } else {
+                $triangle[$i][$j] = $triangle[$i - 1][$j - 1] + $triangle[$i - 1][$j];
+            }
+        }
+    }
+    
+    return $triangle;
+}
+
+// Function to print Pascal's Triangle in a semi-reflected format
+function printPascalsTriangle($triangle) {
+    $rows = count($triangle);
+    
+    for ($i = 0; $i < $rows; $i++) {
+        // Add spaces for alignment
+        for ($space = 0; $space < $rows - $i - 1; $space++) {
+            echo "&nbsp;&nbsp;"; // Use non-breaking spaces for HTML
+        }
+        
+        // Print the numbers in the row
+        for ($j = 0; $j <= $i; $j++) {
+            echo $triangle[$i][$j] . "&nbsp;&nbsp;";
+        }
+        echo "<br>";
+    }
+}
+
+// Get user input for the number of rows
+if (isset($_POST['submit'])) {
+    $rows = intval($_POST['rows']);
+    if ($rows > 0) {
+        $triangle = generatePascalsTriangle($rows);
+        printPascalsTriangle($triangle);
+    } else {
+        echo "Please enter a valid number of rows.";
+    }
+}
+?>
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Pascal's Triangle (Semi-Reflected)</title>
+</head>
+<body>
+    <h1>Pascal's Triangle (Semi-Reflected)</h1>
+    <form method="post">
+        <label for="rows">Enter the number of rows:</label>
+        <input type="number" id="rows" name="rows" min="1" required>
+        <button type="submit" name="submit">Generate</button>
+    </form>
+</body>
+</html>
+
+
+
+
+
+
+
+
+<form action="" method="get">
+    <label>Enter book name to search : </label>
+    <input type="text" name="booktitle" required>
+
+    <button name="search" type="submit">Search</button>
+
+    <?php
+        if (isset($_GET['status'])) {
+            if ($_GET['status'] === 'failed') {
+                echo "<br>No Books Found" ;
+            }
+        }
+    ?>
+
+
+</form>
+
+
+<?php
+require "dbconnection.php" ;
+
+if (isset($_GET['search'])) {
+    $booktitle = $_GET['booktitle'] ;
+
+    $search = "SELECT * from book_details WHERE title LIKE '%$booktitle%' " ;
+
+    $result = $connection->query($search) ; 
+
+    if ($result->num_rows > 0) {
+        foreach ($result as $row) { 
+            echo "<p>ISBN: ".$row['isbn']."</p>";
+            echo "<p>Title: ".$row['title']."</p>";
+            echo "<p>Author: ".$row['author']."</p>";
+            echo "<p>Edition: ".$row['edition']."</p>";
+            echo "<p>Publication: ".$row['publication']."</p>";
+            echo "<hr>";
+        } 
+    } else {
+        header("Location: search_books.php?status=failed") ; 
+    }
+}
+
+?>
+
+
+
+
+
+
+
+
