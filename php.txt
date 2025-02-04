@@ -1,5 +1,6 @@
+//pascal
+
 <?php
-// Function to generate Pascal's Triangle
 function generatePascalsTriangle($rows) {
     $triangle = array();
     
@@ -17,17 +18,14 @@ function generatePascalsTriangle($rows) {
     return $triangle;
 }
 
-// Function to print Pascal's Triangle in a semi-reflected format
 function printPascalsTriangle($triangle) {
     $rows = count($triangle);
     
     for ($i = 0; $i < $rows; $i++) {
-        // Add spaces for alignment
         for ($space = 0; $space < $rows - $i - 1; $space++) {
             echo "&nbsp;&nbsp;"; // Use non-breaking spaces for HTML
         }
         
-        // Print the numbers in the row
         for ($j = 0; $j <= $i; $j++) {
             echo $triangle[$i][$j] . "&nbsp;&nbsp;";
         }
@@ -35,7 +33,7 @@ function printPascalsTriangle($triangle) {
     }
 }
 
-// Get user input for the number of rows
+
 if (isset($_POST['submit'])) {
     $rows = intval($_POST['rows']);
     if ($rows > 0) {
@@ -64,54 +62,135 @@ if (isset($_POST['submit'])) {
 
 
 
+//dbconnection
+
+
+CREATE DATABASE library_db;
+
+USE library_db;
+
+CREATE TABLE books (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    isbn VARCHAR(20) NOT NULL,
+    title VARCHAR(255) NOT NULL,
+    author VARCHAR(100) NOT NULL,
+    edition VARCHAR(50),
+    publication VARCHAR(100)
+);
 
 
 
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Simple Library Management System</title>
+</head>
+<body>
+    <h2>Simple Library Management System</h2>
+    <form action="insert_books.php" method="post">
+        <label>Enter ISBN:</label>
+        <input type="text" name="isbn" required><br>
 
+        <label>Enter Title:</label>
+        <input type="text" name="title" required><br>
 
-<form action="" method="get">
-    <label>Enter book name to search : </label>
-    <input type="text" name="booktitle" required>
+        <label>Enter Author:</label>
+        <input type="text" name="author" required><br>
 
-    <button name="search" type="submit">Search</button>
+        <label>Enter Edition:</label>
+        <input type="text" name="edition"><br>
 
-    <?php
-        if (isset($_GET['status'])) {
-            if ($_GET['status'] === 'failed') {
-                echo "<br>No Books Found" ;
-            }
-        }
-    ?>
+        <label>Enter Publication:</label>
+        <input type="text" name="publication"><br>
 
+        <input type="submit" value="Submit">
+        <input type="reset" value="Reset">
+    </form>
 
-</form>
+    <p>New record created successfully</p>
+    <a href="search_book.php">To search for the Book information click here</a>
+</body>
+</html>
+
 
 
 <?php
-require "dbconnection.php" ;
+$servername = "localhost";
+$username = "root";  // Change if needed
+$password = "";  // Change if needed
+$dbname = "library_db";
 
-if (isset($_GET['search'])) {
-    $booktitle = $_GET['booktitle'] ;
+// Create connection
+$conn = new mysqli($servername, $username, $password, $dbname);
 
-    $search = "SELECT * from book_details WHERE title LIKE '%$booktitle%' " ;
+// Check connection
+if ($conn->connect_error) {
+    die("Connection failed: " . $conn->connect_error);
+}
+?>
 
-    $result = $connection->query($search) ; 
 
-    if ($result->num_rows > 0) {
-        foreach ($result as $row) { 
-            echo "<p>ISBN: ".$row['isbn']."</p>";
-            echo "<p>Title: ".$row['title']."</p>";
-            echo "<p>Author: ".$row['author']."</p>";
-            echo "<p>Edition: ".$row['edition']."</p>";
-            echo "<p>Publication: ".$row['publication']."</p>";
-            echo "<hr>";
-        } 
+
+<?php
+include 'DbConnection.php';
+
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    $isbn = $_POST['isbn'];
+    $title = $_POST['title'];
+    $author = $_POST['author'];
+    $edition = $_POST['edition'];
+    $publication = $_POST['publication'];
+
+    $sql = "INSERT INTO books (isbn, title, author, edition, publication) 
+            VALUES ('$isbn', '$title', '$author', '$edition', '$publication')";
+
+    if ($conn->query($sql) === TRUE) {
+        echo "New record created successfully. <a href='page.php'>Go back</a>";
     } else {
-        header("Location: search_books.php?status=failed") ; 
+        echo "Error: " . $sql . "<br>" . $conn->error;
     }
 }
-
+$conn->close();
 ?>
+
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Search Book</title>
+</head>
+<body>
+    <h2>Search for a Book</h2>
+    <form method="GET">
+        <input type="text" name="query" placeholder="Enter book title">
+        <input type="submit" value="Search">
+    </form>
+
+    <?php
+    include 'DbConnection.php';
+
+    if (isset($_GET['query'])) {
+        $search = $_GET['query'];
+        $sql = "SELECT * FROM books WHERE title LIKE '%$search%'";
+        $result = $conn->query($sql);
+
+        if ($result->num_rows > 0) {
+            echo "<h3>Search Results:</h3>";
+            while ($row = $result->fetch_assoc()) {
+                echo "ISBN: " . $row['isbn'] . "<br>";
+                echo "Title: " . $row['title'] . "<br>";
+                echo "Author: " . $row['author'] . "<br>";
+                echo "Edition: " . $row['edition'] . "<br>";
+                echo "Publication: " . $row['publication'] . "<br><hr>";
+            }
+        } else {
+            echo "No records found.";
+        }
+    }
+    $conn->close();
+    ?>
+</body>
+</html>
 
 
 // matrix
