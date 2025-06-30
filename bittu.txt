@@ -1,661 +1,262 @@
-import java.util.*;
-
-public class SchedulingCalculator {
-    public static void main(String[] args) {
-        int[] pid = {1, 2, 3, 4};
-        int[] bt = {21, 3, 6, 2};
-
-        System.out.println("FCFS Scheduling:");
-        schedule(pid, bt, false);
-
-        System.out.println("\nSJF Scheduling:");
-        schedule(pid, bt, true);
-
-        System.out.println("\nRound-Robin Scheduling (Quantum = 4ms):");
-        roundRobin(pid, bt, 4);
-    }
-
-    static void schedule(int[] pid, int[] bt, boolean sjf) {
-        int n = pid.length, ct = 0, totalTAT = 0, totalWT = 0;
-        int[][] p = new int[n][2];
-
-        for (int i = 0; i < n; i++) {
-            p[i][0] = pid[i];
-            p[i][1] = bt[i];
-        }
-
-        if (sjf) Arrays.sort(p, Comparator.comparingInt(a -> a[1]));
-
-        System.out.println("PID | BT | CT | TAT | WT");
-        for (int i = 0; i < n; i++) {
-            ct += p[i][1];
-            int tat = ct, wt = tat - p[i][1];
-            totalTAT += tat;
-            totalWT += wt;
-            System.out.printf("%3d | %2d | %2d | %3d | %2d\n", p[i][0], p[i][1], ct, tat, wt);
-        }
-        System.out.printf("\nAvg TAT: %.2f, Avg WT: %.2f\n", (double) totalTAT / n, (double) totalWT / n);
-    }
-
-    static void roundRobin(int[] pid, int[] bt, int quantum) {
-        int n = pid.length;
-        int[] remainingBT = Arrays.copyOf(bt, n);
-        int[] ct = new int[n], tat = new int[n], wt = new int[n];
-        int totalTAT = 0, totalWT = 0, time = 0;
-        Queue<Integer> queue = new LinkedList<>();
-
-        for (int i = 0; i < n; i++) queue.add(i);
-
-        while (!queue.isEmpty()) {
-            int i = queue.poll();
-            if (remainingBT[i] > quantum) {
-                time += quantum;
-                remainingBT[i] -= quantum;
-                queue.add(i);
-            } else {
-                time += remainingBT[i];
-                remainingBT[i] = 0;
-                ct[i] = time;
-                tat[i] = ct[i];
-                wt[i] = tat[i] - bt[i];
-                totalTAT += tat[i];
-                totalWT += wt[i];
-            }
-        }
-
-        System.out.println("PID | BT | CT | TAT | WT");
-        for (int i = 0; i < n; i++) {
-            System.out.printf("%3d | %2d | %2d | %3d | %2d\n", pid[i], bt[i], ct[i], tat[i], wt[i]);
-        }
-        System.out.printf("\nAvg TAT: %.2f, Avg WT: %.2f\n", (double) totalTAT / n, (double) totalWT / n);
-    }
-}
-
-
-
-
-
-
-
-
-import java.util.Arrays;
-
-public class SchedulingCalculator {
-    public static void main(String[] args) {
-        int[] bt = {21, 3, 6, 2};
-
-        System.out.println("FCFS Scheduling:");
-        schedule(bt, false);
-
-        System.out.println("\nSJF Scheduling:");
-        schedule(bt, true);
-    }
-
-    static void schedule(int[] bt, boolean sjf) {
-        if (sjf) Arrays.sort(bt);
-
-        int ct = 0, totalTAT = 0, totalWT = 0;
-
-        System.out.println("BT | CT | TAT | WT");
-        for (int b : bt) {
-            ct += b;
-            int tat = ct, wt = tat - b;
-            totalTAT += tat;
-            totalWT += wt;
-            System.out.printf("%2d | %2d | %3d | %2d\n", b, ct, tat, wt);
-        }
-        System.out.printf("\nAvg TAT: %.2f, Avg WT: %.2f\n", (double) totalTAT / bt.length, (double) totalWT / bt.length);
-    }
-}
-
-
-
-
-
-
-#include <iostream>
-#include <unistd.h>
-#include <sys/wait.h>
-#include <algorithm>
-#include <numeric>
-#include <cmath>
-using namespace std;
-
-int main() {
-    int arr[10];
-
-    cout << "Enter 10 integers: "<<endl;
-    for (int &n : arr) cin >> n;
-
-    // Fork and perform tasks based on process number
-    for (int i = 0; i < 8; i++) {
-        pid_t pid = fork();
-
-        if (pid == 0) {
-            switch (i) {
-                case 0: 
-                    cout << "Array elements: ";
-                    for (int n : arr) cout << n << " ";
-                    cout << endl;
-                    break;
-                case 1: // Sum of all numbers
-                    cout << "Sum of all numbers: " << accumulate(arr, arr + 10, 0) << endl;
-                    break;
-                case 2: // Sum of even numbers
-                    cout << "Sum of even numbers: " 
-                         << accumulate(arr, arr + 10, 0, [](int a, int b) { return b % 2 == 0 ? a + b : a; }) 
-                         << endl;
-                    break;
-                case 3: // Sum of odd numbers
-                    cout << "Sum of odd numbers: " 
-                         << accumulate(arr, arr + 10, 0, [](int a, int b) { return b % 2 != 0 ? a + b : a; }) 
-                         << endl;
-                    break;
-                case 4: // Sum of prime numbers
-                    cout << "Sum of prime numbers: "  << endl;
-                    break;
-                case 5: { // Sort array in ascending order
-                    sort(arr, arr + 10);
-                    cout << "Array in ascending order: ";
-                    for (int n : arr) cout << n << " ";
-                    cout << endl;
-                    break;
-                }
-                case 6: // Find the maximum number
-                    cout << "Maximum number: " << *max_element(arr, arr + 10) << endl;
-                    break;
-                case 7: { // Search for a number
-                    int x;
-                    cout << "Enter a number to search: ";
-                    cin >> x;
-                    cout << (find(arr, arr + 10, x) != arr + 10 ? "Number found" : "Number not found") << endl;
-                    break;
-                }
-            }
-        }
-    }
-
-    // Parent process waits for all child processes to complete
-    while (wait(NULL) > 0);
-    return 0;
-}
-
-
-
-
-
-
-# Create the text file Question4.txt
-touch Question4.txt
-
-# Create folder structure
-mkdir -p MyPractical/Repair Installation
-
-# Rename the 'products' folder as 'MyPractical'
-mv products MyPractical
-
-# Create two text files inside 'MyPractical'
-touch MyPractical/MyFirstFile.txt MyPractical/MySecondFile.txt
-
-# Rename those files to 'FirstFile.txt' and 'SecondFile.txt'
-mv MyPractical/MyFirstFile.txt MyPractical/FirstFile.txt
-mv MyPractical/MySecondFile.txt MyPractical/SecondFile.txt
-
-# Insert sentence in 'FirstFile.txt'
-echo "I’m following Introduction to OS in Trincomalee Campus, Eastern University, Sri Lanka." > MyPractical/FirstFile.txt
-
-# Insert personal details into 'SecondFile.txt'
-echo -e "Registration No: [Your Registration Number]\nName: Judechihan\nDate of Birth: [Your DOB]\nAddress: Udaiyarkaddu North, Udaiyarkaddu" > MyPractical/SecondFile.txt
-
-# Copy 'FirstFile.txt' to the 'Repair' folder
-cp MyPractical/FirstFile.txt MyPractical/Repair/
-
-# Move 'SecondFile.txt' to the 'Repair' folder
-mv MyPractical/SecondFile.txt MyPractical/Repair/
-
-# Append content of 'FirstFile.txt' to 'SecondFile.txt' inside 'Repair' folder
-cat MyPractical/FirstFile.txt >> MyPractical/Repair/SecondFile.txt
-
-# Zip/Compress the 'MyPractical' folder
-zip -r MyPractical.zip MyPractical
-
-# Delete the 'Installation' folder
-rm -r Installation
-
-# Create user 'guestUser' and set password 'open 1234'
-sudo useradd guestUser
-echo "guestUser:open1234" | sudo chpasswd
-
-# Login as 'guestUser'
-su guestUser
-
-
-import java.util.*;
-public class PreEmptivePS {
-    public static void main(String[] args) {
-        Scanner sc = new Scanner(System.in);
-
-        System.out.print("Enter the number of processes: ");
-        int n = sc.nextInt();
-
-        int[] process = new int[n];
-        int[] AT = new int[n];
-        int[] BT = new int[n];
-        int[] priority = new int[n];
-        int[] CT = new int[n];
-        int[] TAT = new int[n];
-        int[] WT = new int[n];
-        int[] remainingBT = new int[n];
-        boolean[] completed = new boolean[n];
-
-        System.out.println("Enter the arrival time, burst time, and priority for each process:");
-        for (int i = 0; i < n; i++) {
-            process[i] = i + 1;
-            System.out.print("\tProcess " + (i + 1) + " arrival time: ");
-            AT[i] = sc.nextInt();
-            System.out.print("\tProcess " + (i + 1) + " burst time: ");
-            BT[i] = sc.nextInt();
-            System.out.print("\tProcess " + (i + 1) + " priority: ");
-            priority[i] = sc.nextInt();
-            remainingBT[i] = BT[i];
-            System.out.println();
-        }
-
-        int currentTime = 0;
-        int completedProcess = 0;
-
-        while (completedProcess < n) {
-            int highestPriority = -1;
-            int maxPriority = Integer.MIN_VALUE;
-
-            for (int i = 0; i < n; i++) {
-                if (!completed[i] && AT[i] <= currentTime && priority[i] > maxPriority) {
-                    highestPriority = i;
-                    maxPriority = priority[i];
-                }
-            }
-
-            if (highestPriority == -1) {
-                currentTime++;
-            } else {
-                remainingBT[highestPriority]--;
-                currentTime++;
-
-                if (remainingBT[highestPriority] == 0) {
-                    completed[highestPriority] = true;
-                    CT[highestPriority] = currentTime;
-                    TAT[highestPriority] = CT[highestPriority] - AT[highestPriority];
-                    WT[highestPriority] = TAT[highestPriority] - BT[highestPriority];
-                    completedProcess++;
-                }
-            }
-        }
-
-        double TWT = 0;
-        double TTAT = 0;
-        for (int i = 0; i < n; i++) {
-            TWT += WT[i];
-            TTAT += TAT[i];
-        }
-
-        System.out.println("Process\tAT\tBT\tPriority\tCT\tTAT\tWT");
-        for (int i = 0; i < n; i++) {
-            System.out.println(process[i] + "\t" + AT[i] + "\t" + BT[i] + "\t" + priority[i] + "\t\t" + CT[i] + "\t" + TAT[i] + "\t" + WT[i]);
-        }
-
-        System.out.println("\nAverage waiting time: " + (TWT / n));
-        System.out.println("Average turn around time: " + (TTAT / n));
-    }
-}
-
-
-
-
-import java.util.*;
-public class PreEmptiveSJF{
-	public static void main(String[] args){
-		Scanner sc = new Scanner(System.in);
-		
-		System.out.print("Enter thr number of processes:");
-		int n = sc.nextInt();
-		
-		int[] process = new int[n];
-		int[] AT = new int[n];
-		int[] BT = new int[n];
-		int[] CT = new int[n];
-		int[] TAT = new int[n];
-		int[] WT = new int[n];
-		int[] remainingBT = new int[n];
-		boolean[] completed = new boolean[n];
-		
-		System.out.println("Enter the arrival time and burst time for each processes.");
-		for(int i=0;i<n;i++){
-			process[i] = i+1;
-			System.out.print("Process "+(i+1)+" arrival time:");
-			AT[i] = sc.nextInt();
-			System.out.print("Process "+(i+1)+" burst time:");
-			BT[i] = sc.nextInt;
-			remainingBT[i] = BT[i]
-			System.out.println();
-		}
-		
-		int currentTime = 0;
-		int completedProcess = 0;
-		
-		while(completedProcess < n){
-			int shortest = -1;
-			int MinRemainingBT = Integer.MAX_VALUE;
-			
-			for(int i=0;i<n;i++){
-				if(!completed[i] && AT[i] <= currentTime && remainingBT[i] < MinRemainingBT){
-					shortest = i;
-					MinRemainingBT = remainingBT[i];
-				}
-			}
-			
-			if(shortest ==-1){
-				currentTime++;
-			}else{
-				remainingBT[shortest]--;
-				currentTime++;
-				if(remainingBT[shortest] == 0){
-					completed[shortest] = true;
-					completedProcess++;
-					CT[shortest] = currentTime;
-					TAT[shortest] = CT[shortest] - AT[shortest];
-					WT[shortest] = TAT[shortest] - BT[shortest];
-				}
-			}
-		}
-		
-		double totalWT = 0, totalTAT = 0;
-    System.out.println("Process\tAT\tBT\tCT\tWT\tTAT");
-    for (int i = 0; i < n; i++) {
-      totalWT += WT[i];
-			totalTAT += TAT[i];
-      System.out.println(process[i] + "\t" + AT[i] + "\t" + BT[i] + "\t"+ CT[i] + "\t" + WT[i] + "\t" + TAT[i]);
-    }
-
-    System.out.println("\nAverage Waiting Time: " + (totalWT / n));
-    System.out.println("Average Turnaround Time: " + (totalTAT / n));
-		
-	}
-}
-
-
-import java.util.*;
-public class NonPreEmptiveSJF{
-	public static void main(String[] args){
-		Scanner sc = nre Scanner(Systemin);
-		
-		System.out.print("Enter thr number of processes:");
-		int n = sc.nextInt();
-		
-		int[] process = new int[n];
-		int[] AT = new int[n];
-		int[] BT = new int[n];
-		int[] CT = new int[n];
-		int[] TAT = new int[n];
-		int[] WT = new int[n];
-		boolean[] completed = new boolean[n];
-		
-		System.out.println("Enter the arrival time and burst time for each processes.");
-		for(int i=0;i<n;i++){
-			process[i] = i+1;
-			System.out.print("Process "+(i+1)+" arrival time:");
-			AT[i] = sc.nextInt();
-			System.out.print("Process "+(i+1)+" burst time:");
-			BT[i] = sc.nextInt();
-			System.out.println();
-		}
-		
-		int currentTime = 0;
-		int completedProcess = 0;
-		
-		while(completedProcess < n){
-			int shortest = -1;
-			int minBT = Integer.MAX_VALUE;
-			
-			for(int i=0;i<n;i++){
-				if(!completed[i] && AT[i] <= currentTime && BT[i] < minBT){
-					shortest = i;
-					minBT = BT[i];
-				}
-			}
-			
-			if(shortest == -1){
-				currentTime++;
-			}else{
-				currentTime += BT[shortest];
-				CT[shortest] = currentTime;
-				TAT[shortest] = CT[shortest] - AT[shortest];
-				WT[shortest] = TAT[shortest] - BT[shortest];
-				completed[shortest] = true;
-				completedProcess++;
-			}
-		}
-		
-		double TWT = 0;
-		double TTAT = 0;
-		for(int i=0;i<n;i++){
-			TWT += WT[i];
-			TTAT += TAT[i];
-		}
-		
-		System.out.println("Process\tAT\tBT\tCT\tTAT\tWT");
-    for (int i = 0; i < n; i++) {
-      System.out.println(process[i] + "\t" + AT[i] + "\t" + BT[i] + "\t" + CT[i] + "\t" + TAT[i] + "\t" + WT[i]);
-    }
-
-    System.out.println("\nAverage waiting time: " + (TWT / n));
-    System.out.println("Average turn around time: " + (TTAT / n));
-		
-		
-	}
-}
-
-
-
-import java.util.*;
-public class RoundRobin {
-    public static void main(String[] args) {
-        Scanner sc = new Scanner(System.in);
-
-        System.out.print("Enter the number of processes: ");
-        int n = sc.nextInt();
-
-        System.out.print("Enter the time quantum: ");
-        int timeQuantum = sc.nextInt();
-
-        int[] AT = new int[n];
-        int[] BT = new int[n];
-        int[] remainingBT = new int[n];
-        int[] CT = new int[n];
-        int[] TAT = new int[n];
-        int[] WT = new int[n];
-
-        System.out.println("Enter the arrival time and burst time for each process:");
-        for (int i = 0; i < n; i++) {
-            System.out.print("\tProcess " + (i + 1) + " arrival time: ");
-            AT[i] = sc.nextInt();
-            System.out.print("\tProcess " + (i + 1) + " burst time: ");
-            BT[i] = sc.nextInt();
-            remainingBT[i] = BT[i];
-						System.out.println();
-        }
-
-				int currentTime = 0;
-				int completedProcess = 0;
-				Queue<Integer> readyQueue = new LinkedList<>();
-				
-				while(completedProcess < n){
-					for(int i=0;i<n;i++){
-						if(AT[i] < currentTime && remainingBT[i] > 0 && !readyQueue.contains(i)){
-							readyQueue.add(i);
-						}
-					}
+package line;
+
+import javax.swing.*;
+import java.awt.*;
+
+public class HouseRotation extends JPanel {
+
+	// House components: Base, Roof, and Door
+		int[][] base = {{100, 200}, {300, 200}, {300, 400}, {100, 400}, {100, 200}};
+		int[][] roof = {{100, 200}, {200, 100}, {300, 200}, {100, 200}};
+		int[][] door = {{170, 400}, {230, 400}, {230, 320}, {170, 320}, {170, 400}};
+
+			public void paint(Graphics g) {
+
+
+				// Draw original house (Blue)
+				g.setColor(Color.BLUE);
+				drawShape(g,base);
+				drawShape(g,roof);
+				drawShape(g,door);
+
+				// translate the house by (-100,-400)
+				translate(base, -100, -400);
+				translate(roof, -100, -400);
+				translate(door, -100, -400);
+
+				// rotate the house by 15
+					rotate(base, 90);
+					rotate(roof, 90);
+					rotate(door, 90);
+
+					// translate the house by (100,400)
+					translate(base, 300, 400);
+					translate(roof, 300, 400);
+					translate(door, 300, 400);
+					// Draw house after rotation about pivot point (Red)
+					g.setColor(Color.RED);
+					drawShape(g,base);
+					drawShape(g,roof);
+					drawShape(g,door);
+
+					// scale the house by 1.5 in both x and y
+					scale(base, 1.5, 1.5);
+					scale(roof, 1.5, 1.5);
+					scale(door, 1.5, 1.5);
 					
-					if(readyQueue.isEmpty()){
-						currentTime++;
-						continue;
-					}
-					
-					int currentProcess = readyQueue.poll();
-					if(remainingBT[currentProcess] > timeQuantum){
-						currentTime += timeQuantum;
-						remainingBT[currentProcess] -= timeQuantum;
-						for(int i=0;i<n;i++){
-							if(AT[i] < currentTime && remainingBT[i] > 0 && !readyQueue.contains(i) && i!=currentProcess){
-								readyQueue.add(i);
-							}
-						}
-						readyQueue.add(currentProcess);
-					}else{
-						currentTime+=remainingBT[currentProcess];
-						CT[currentProcess] = currentTime;
-						TAT[currentProcess] = CT[currentProcess] - AT[currentProcess];
-						WT[currentProcess] = TAT[currentProcess] - BT[currentProcess];
-						remainingBT[currentProcess] = 0;
-						completedProcess++;
-						
-					}
+					g.setColor(Color.RED);
+					drawShape(g,base);
+					drawShape(g,roof);
+					drawShape(g,door);
+
+
+
+			}
+
+			// Draw a shape using DDA line algorithm
+			public void drawShape(Graphics g,int[][] shape) {
+				for (int i = 0; i < shape.length-1 ; i++) {
+					ddaLine(g,shape[i][0], shape[i][1], shape[i + 1][0], shape[i + 1][1]);
 				}
-			
-			
-        System.out.println("Process\tAT\tBT\tCT\tTAT\tWT");
-        double totalWT = 0, totalTAT = 0;
-        for (int i = 0; i < n; i++) {
-            totalWT += WT[i];
-            totalTAT += TAT[i];
-            System.out.println((i + 1) + "\t" + AT[i] + "\t" + BT[i] + "\t" + CT[i] + "\t" + TAT[i] + "\t" + WT[i]);
-        }
+			}
 
-        System.out.println("\nAverage Waiting Time: " + (totalWT / n));
-        System.out.println("Average Turnaround Time: " + (totalTAT / n));
-    }
-}
+			// DDA Line Algorithm
 
-import java.util.*;
-public class NonPreEmptivePS {
-    public static void main(String[] args) {
-        Scanner sc = new Scanner(System.in);
 
-        System.out.print("Enter the number of processes: ");
-        int n = sc.nextInt();
-
-        int[] process = new int[n];
-        int[] AT = new int[n];
-        int[] BT = new int[n];
-        int[] priority = new int[n];
-        int[] CT = new int[n];
-        int[] TAT = new int[n];
-        int[] WT = new int[n];
-        boolean[] completed = new boolean[n];
-
-        System.out.println("Enter the arrival time, burst time, and priority for each process:");
-        for (int i = 0; i < n; i++) {
-            process[i] = i + 1;
-            System.out.print("\tProcess " + (i + 1) + " arrival time: ");
-            AT[i] = sc.nextInt();
-            System.out.print("\tProcess " + (i + 1) + " burst time: ");
-            BT[i] = sc.nextInt();
-            System.out.print("\tProcess " + (i + 1) + " priority: ");
-            priority[i] = sc.nextInt();
-            System.out.println();
-        }
-
-        int currentTime = 0;
-				int completedProcess = 0;
-				
-				while(completedProcess < n){
-					int highestPriority = -1;
-					int maxPriority = Integer.MIN_VALUE;
-					
-					for(int i=0;i<n;i++){
-						if(!completed[i] && AT[i] <= currentTime && priority[i] > maxPriority){
-							highestPriority = i;
-							maxPriority = priority[i];
-						}
-					}
-					if(highestPriority == -1){
-						currentTime++;
-					}else{
-						currentTime += BT[highestPriority];
-						CT[highestPriority] = currentTime;
-						TAT[highestPriority] = CT[highestPriority] - AT[highestPriority];
-						WT[highestPriority] = TAT[highestPriority] - BT[highestPriority];
-						completed[highestPriority] = true;
-						completedProcess++;
-					}
+			// Translation function
+			public void translate(int[][] shape, int tx, int ty) {
+				for (int i = 0; i < shape.length; i++) {
+					shape[i][0] += tx;
+					shape[i][1] += ty;
 				}
+			}
+			// Rotate function
 
-        double TWT = 0;
-        double TTAT = 0;
-        for (int i = 0; i < n; i++) {
-            TWT += WT[i];
-            TTAT += TAT[i];
-        }
-
-        System.out.println("Process\tAT\tBT\tPriority\tCT\tTAT\tWT");
-        for (int i = 0; i < n; i++) {
-            System.out.println(process[i] + "\t" + AT[i] + "\t" + BT[i] + "\t" + priority[i] + "\t\t" + CT[i] + "\t" + TAT[i] + "\t" + WT[i]);
-        }
-
-        System.out.println("\nAverage waiting time: " + (TWT / n));
-        System.out.println("Average turn around time: " + (TTAT / n));
-    }
-}
- import java.util.*;
-public class FCFS{
-	public static void main(String[] args){
-		Scanner sc  = new Scanner(System.in);
-		
-		System.out.print("Enter the number of processes:");
-		int n =sc.nextInt();
-		
-		int[] process = new int[n];
-		int[] AT = new int[n];
-		int[] BT = new int[n];
-		int[] CT = new int[n];
-		int[] TAT = new int[n];
-		int[] WT = new int[n];
-		
-		System.out.println("Enter the arrival time and burst time for each processes:");
-		for(int i=0;i<n;i++){
-			process[i] = i+1;
-			System.out.print("\tProcess "+(i+1)+" arrival time:");
-			AT[i] = sc.nextInt();
-			System.out.print("\tProcess "+(i+1)+" burst time:");
-			BT[i] = sc.nextInt();
-			System.out.println();
-		}
-		
-		int currentTime = 0;
-		for(int i=0;i<n;i++){
-			if(currentTime < AT[i]){
-				currentTime = AT[i];
+			public void rotate(int[][] shape, double angleDegrees) {
+				double angle = Math.toRadians(angleDegrees); // Convert to radians
+				for (int i = 0; i < shape.length; i++) {
+					int x = shape[i][0];
+					int y = shape[i][1];
+					shape[i][0] = (int) Math.round(x * Math.cos(angle) - y * Math.sin(angle));
+					shape[i][1] = (int) Math.round(x * Math.sin(angle) + y * Math.cos(angle));
+				}
 			}
 			
-			CT[i] = currentTime + BT[i];
-			TAT[i] = CT[i] - AT[i];
-			WT[i] = TAT[i] - BT[i];
-			currentTime = CT[i];
-		}
-		
-		double TWT = 0;
-		double TTAT = 0;
-		for(int i=0;i<n;i++){
-			TWT += WT[i];
-			TTAT += TAT[i];
-		}
-		
-		System.out.println("Process\tAT\tBT\tCT\tTAT\tWT");
-		for(int i=0;i<n;i++){
-			System.out.println(process[i] + "\t" + AT[i] + "\t" + BT[i] + "\t" + CT[i] + "\t" + TAT[i] + "\t" + WT[i]);
-		}
-		
-		System.out.println("Average waiting time:"+(TWT/n));
-		System.out.println("Average turn around time:"+(TTAT/n));
-		
+			// Scaling function
+			public void scale(int[][] shape, double sx, double sy) {
+			    for (int i = 0; i < shape.length; i++) {
+			        shape[i][0] = (int) Math.round(shape[i][0] * sx);
+			        shape[i][1] = (int) Math.round(shape[i][1] * sy);
+			    }
+			}
+
+
+
+
+
+
+
+
+
+			public void ddaLine(Graphics g,int x1, int y1, int x2, int y2) {
+				int dx = x2 - x1, dy = y2 - y1, steps = Math.max(Math.abs(dx), Math.abs(dy));
+				float Xinc = (float) dx / steps, Yinc = (float) dy / steps;
+				float x = x1, y = y1;
+				for (int i = 0; i <= steps; i++) {
+					g.fillRect(Math.round(x), Math.round(y), 2, 2);
+					x += Xinc;
+					y += Yinc;
+				}
+			}
+
+
+
+
+
+			// Main method to run the program
+			public static void main(String[] args) {
+				JFrame frame = new JFrame("House Rotation Example");
+				frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+				frame.setSize(900, 900);
+				frame.add(new HouseRotation());
+				frame.setVisible(true);
+			}
 	}
+
+
+
+
+
+
+
+
+///bresenham circle 
+
+package line;
+import java.awt.*;
+import javax.swing.*;
+
+public class bcircle extends JPanel{
+	
+	
+	
+	
+	
+	public void paint(Graphics g) {
+		draw(g,200,200,100);
+	}
+	
+	public void draw(Graphics g,int xc, int yc, int r) {
+		int x=0;
+		int y=r;
+		int p =3-2 *r;
+
+		while(y>=x) {
+			x++;
+			if(p<0) {
+				p += 4*x+6;
+			}
+			else {
+				y--;
+				p += 4*(x-y)+10;
+			}
+			plot(g,xc,yc,x,y);
+		}
+	}
+	public void plot(Graphics g, int xc,int yc, int x, int y) {
+		g.fillRect(xc+x, yc+y, 2, 2);
+		g.fillRect(xc-x, yc+y, 2, 2);
+		g.fillRect(xc+x, yc-y, 2, 2);
+		g.fillRect(xc-x, yc-y, 2, 2);
+		g.fillRect(xc+y, yc+x, 2, 2);
+		g.fillRect(xc-y, yc+x, 2, 2);
+		g.fillRect(xc+y, yc-x, 2, 2);
+		g.fillRect(xc-y, yc-x, 2, 2);
+	}
+	
+	
+	
+	public static void main(String []args) {
+		JFrame frame = new JFrame("brcircle");
+		bcircle panel = new bcircle();
+		frame.add(panel);
+		frame.setSize(400,400);
+		frame.setVisible(true);
+	}
+
+}
+
+
+//bresenham line 
+
+package line;
+
+import java.awt.*;
+import javax.swing.*;
+
+public class BresenhamLineDrawing extends JPanel {
+
+    public void paint(Graphics g) {
+        g.setColor(Color.RED);
+        draw(g, 50, 150, 150, 50);   // Roof left
+        g.setColor(Color.BLACK);
+        draw(g, 150, 50, 250, 150);  // Roof right
+        g.setColor(Color.GREEN);
+        draw(g, 50, 150, 250, 150);  // Top wall
+        g.setColor(Color.BLACK);
+        draw(g, 50, 150, 50, 300);   // Left wall
+        draw(g, 250, 150, 250, 300); // Right wall
+        draw(g, 50, 300, 250, 300);  // Bottom
+        draw(g, 125, 250, 125, 300); // Door left
+        draw(g, 175, 250, 175, 300); // Door right
+        draw(g, 125, 250, 175, 250); // Door top
+    }
+
+    public void draw(Graphics g, int x1, int y1, int x2, int y2) {
+        int dx = Math.abs(x2 - x1);
+        int dy = Math.abs(y2 - y1);
+        int sx = x1 < x2 ? 1 : -1;
+        int sy = y1 < y2 ? 1 : -1;
+
+        int x = x1;
+        int y = y1;
+
+        // Case 1: gentle slope (dx > dy)
+        if (dx > dy) {
+            int p = 2 * dy - dx;
+            for (int i = 0; i <= dx; i++) {
+                g.fillRect(x, y, 2, 2);
+                x += sx;
+                if (p < 0) {
+                    p += 2 * dy;
+                } else {
+                    y += sy;
+                    p += 2 * (dy - dx);
+                }
+            }
+        }
+        // Case 2: steep slope (dy >= dx)
+        else {
+            int p = 2 * dx - dy;
+            for (int i = 0; i <= dy; i++) {
+                g.fillRect(x, y, 2, 2);
+                y += sy;
+                if (p < 0) {
+                    p += 2 * dx;
+                } else {
+                    x += sx;
+                    p += 2 * (dx - dy);
+                }
+            }
+        }
+    }
+
+    public static void main(String[] args) {
+        JFrame frame = new JFrame("Bresenham Line Drawing (No Swap)");
+        BresenhamLineDrawing panel = new BresenhamLineDrawing();
+        frame.add(panel);
+        frame.setSize(400, 400);
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.setVisible(true);
+    }
 }
